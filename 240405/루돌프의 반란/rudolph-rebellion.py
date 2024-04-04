@@ -1,3 +1,5 @@
+### 가장 어려웠던 포인트 : 너무 복잡함 / stun을 나올 수 있는 턴으로 설정하는거! 
+
 N, M, P, RP, SP = list(map(int, input().split()))
 rudolf = list(map(int, input().split()))
 santa = [[] for _ in range(P + 1)]  # 산타의 현재 위치가 담겨있음
