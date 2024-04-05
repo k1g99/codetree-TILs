@@ -38,25 +38,25 @@ damage = [0 for _ in range(N + 1)]
 def check_border(r, c):
     return r > 0 and c > 0 and r <= L and c <= L
 
-
 next_knights = []
-
 def push(k_id, p_d):
     target = []  # 이동 후 위치
-    # target 계산
-    move_knights = []
+    move_knights = []  # 연쇄적으로 움직일 knights
     can_move = True
+
     for kr, kc in knights[k_id]:
         nr, nc = [kr + dir[p_d][0], kc + dir[p_d][1]]
         if (not check_border(nr, nc)):
             can_move = False
-            continue
-        target.append([nr, nc])
-
-        if (knight_board[nr][nc] not in [0, k_id]):
-            move_knights.append(knight_board[nr][nc])
+            break
+        # 범위 안에 위치함.
         if(board[nr][nc] == 2):
             can_move = False
+            break
+        # 범위 안에 위치하고, 벽도 안만남
+        target.append([nr, nc])
+        if (knight_board[nr][nc] not in [0, k_id] and knight_board[nr][nc] not in move_knights): # 다른 knight가 움직어야함...
+            move_knights.append(knight_board[nr][nc])
 
     if (can_move):  # 움직일 수 있다 (벽돌은 없고 범위 내에 있다)
         if (move_knights):  # 옮겨야할 다른 기사들이 있다면
@@ -64,6 +64,7 @@ def push(k_id, p_d):
                 if(not push(new_k_id, p_d)):
                     return False
             next_knights.append([k_id, target])  # 임시 저장
+            return True
         else:
             next_knights.append([k_id, target])  # 임시 저장
             return True
