@@ -73,7 +73,7 @@ for m in range(M):
             nr, nc = [kr + di[0] * k, kc + di[1] * k]
             if (not check_bound(nr, nc) or board[nr][nc] < 0):
                 break
-            check_next_possible = board[nr][nc]
+            check_next_possible = board[nr][nc] ### 여기가 문제였음!@!!!!@!!@!@! -> 문제 잘 보고, 어디까지 제초제 뿌려야 하는지 정확하게 파악하기
             board[nr][nc] = 0
             able_year[nr][nc] = m + C + 1
             if(check_next_possible == 0):
