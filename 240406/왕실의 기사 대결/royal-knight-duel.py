@@ -50,6 +50,7 @@ def push(k_id, p_d):
         nr, nc = [kr + dir[p_d][0], kc + dir[p_d][1]]
         if (not check_border(nr, nc)):
             can_move = False
+            continue
         target.append([nr, nc])
 
         if (knight_board[nr][nc] not in [0, k_id]):
