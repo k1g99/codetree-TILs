@@ -75,8 +75,6 @@ for m in range(M):
                 break
             check_next_possible = board[nr][nc]
             board[nr][nc] = 0
-            if ((nr, nc) in trees):
-                trees.remove((nr, nc))
             able_year[nr][nc] = m + C + 1
             if(check_next_possible == 0):
                 break
