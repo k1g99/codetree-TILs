@@ -22,10 +22,10 @@ for r in range(N):
             able_year[r][c] = 9999
         elif (row[c] > 0):
             trees.add((r, c))
-if (not trees):
-    print(answer)
 
 for m in range(M):
+    if(not trees):
+        break
     # 성장 & 번식
     seed_trees = []  # [r, c, [0, 1, 2]]
     for r, c in trees:
