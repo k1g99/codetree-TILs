@@ -1,7 +1,6 @@
 N, M, K = list(map(int, input().split()))
 
 answer_moves = 0  # 모든 참가자들의 이동 거리 합
-# answer_exit     # exit 좌표
 
 wall_board = []
 game_board = [[[] for _ in range(N )] for _ in range(N )]
@@ -40,6 +39,13 @@ def get_dist(a, b):
 def get_width(a, b):
     return max(abs(a[0] - b[0]), abs(a[1] - b[1]))
 
+def get_start(sq_start, find_width):
+    for sq_r in range(sq_start[0], game[M+1][0]+1):
+        for sq_c in range(sq_start[1], game[M + 1][1] + 1):
+            sq_end = [sq_r + sq_width, sq_c + sq_width]
+            for fw, fr, fc in find_width:
+                if(sq_start[0] <= fr and sq_start[1]<=fc and sq_end[0]>=fr and sq_end[1]>=fc):
+                    return [sq_r, sq_c]
 
 def rotate(start, width):
     sr, sc = start
@@ -79,11 +85,13 @@ for k in range(K):
         #         if (next_move[0] > dist):
         #             next_move = [dist, [nr, nc]]
         next_move = []
+        cur_dist = get_dist(game[M + 1], [pr, pc])
         for di, d in enumerate(dir):
             nr, nc = [pr + d[0], pc + d[1]]
             if (check_bound([nr, nc])):
                 dist = get_dist(game[M + 1], [nr, nc])
-                next_move.append([dist, di, [nr, nc]])
+                if(dist < cur_dist):
+                    next_move.append([dist, di, [nr, nc]])
         next_move.sort()
 
         # 1-2. 이동하기 -> people 갱신 (exit 도달하는 경우 확인하기)
@@ -119,7 +127,14 @@ for k in range(K):
     sq_width, peo_r, peo_c = find_width[0]
 
     sq_start = [max(0, game[M+1][0] - sq_width), max(0, game[M+1][1] - sq_width)]
-    sq_start = [max(sq_start[0], peo_r - sq_width), max(sq_start[1], peo_c - sq_width)]
+    sq_start = get_start(sq_start, find_width)
+    # for sq_r in range(sq_start[0], game[M+1][0]+1):
+    #     for sq_c in range(sq_start[1], game[M + 1][1] + 1):
+    #         sq_end = [sq_r + sq_width, sq_c + sq_width]
+    #         for fw, fr, fc in find_width:
+    #             if(sq_start[0] <= fr and sq_start[1]<=fr and sq_end[0]>=fr and sq_end[1]>=fc):
+    #                 sq_start = [sq_r, sq_c]
+    #                 break
     sq_width += 1
 
     game_board_cp = [gb[:] for gb in game_board]
@@ -130,7 +145,6 @@ for k in range(K):
         rotate(sq_start, sq_width)
         sq_start = [sq_start[0] + 1, sq_start[1] + 1]
         sq_width -= 2
-
 
 print(answer_moves)
 for g in game[M+1]:
