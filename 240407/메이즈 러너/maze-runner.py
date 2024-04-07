@@ -45,7 +45,7 @@ def rotate(start, width):
     sr, sc = start
     tr, tc = [sr, sc + width - 1]
     if (width == 1):
-        max(0, wall_board[tr][tc] - 1)
+        wall_board[sr][sc] = max(0, wall_board[sr][sc] - 1)
         return
 
     for rdi in range(4):
