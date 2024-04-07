@@ -39,7 +39,9 @@ def get_dist(a, b):
 def get_width(a, b):
     return max(abs(a[0] - b[0]), abs(a[1] - b[1]))
 
-def get_start(sq_start, find_width):
+### 여기가 문제였음!!! 생각했던 알고리즘이 제대로 동작하지 않은 엣지 케이스들이 있을 수 있음
+### 처음부터 최적화하려하지 말고, 일단 BF으로 찾는다고 생각해보기 -> 2번 생각
+def get_start(sq_start, find_width): 
     for sq_r in range(sq_start[0], game[M+1][0]+1):
         for sq_c in range(sq_start[1], game[M + 1][1] + 1):
             sq_end = [sq_r + sq_width, sq_c + sq_width]
