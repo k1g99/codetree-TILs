@@ -53,13 +53,13 @@ for k in range(1,K+1):
             if (board[n][m] > 0):
                 # [공격력, -최근 공격, -(행+열), -열]
                 attacker.append([board[n][m], -1 * last_attack[n][m], -1 * (m + n), -1 * m])
-                # [-공격력, 최근 공격, 행+열, 열]
+                # [-공격력, 최근 공격, 행+열, !!!!열!!!!]
                 target.append([-1 * board[n][m], last_attack[n][m], (m + n), m])
     attacker.sort()
     target.sort()
     if(not attacker):
         break
-
+####################### 행!!! 열!!!! 모르냐 ㅠㅠㅠㅠㅠ 문제 잘읽자 #######################
     attack_r, attack_c = [attacker[0][3] - attacker[0][2], -1 * attacker[0][3]]
     target_r, target_c = [target[0][2] - target[0][3], target[0][3]]
     last_attack[attack_r][attack_c] = k
@@ -111,7 +111,4 @@ for k in range(1,K+1):
         for c in range(M):
             if (free_this_turn[r][c] and board[r][c] > 0):
                 board[r][c] += 1
-    for bo in board:
-        print(bo)
-    print("="*10)
 print(max(map(max, board)))
