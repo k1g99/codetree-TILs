@@ -1,3 +1,6 @@
+import sys
+sys.stdin = open("input.txt", "r")
+
 from collections import deque
 
 N, M, K = list(map(int, input().split()))
@@ -16,13 +19,7 @@ for n in range(N):
     board.append(row)
 
 dir = [[0, 1], [1, 0], [0, -1], [-1, 0]]  # 우/하/좌/상
-every_dir = [[-1, -1], [0, -1], [1, -1], [0, -1], [0, 1], [-1, 1], [0, 1], [1, 1]]
-
-
-def check_bound(a):
-    c, r = a
-    return c >= 0 and r >= 0 and r < N and c < N
-
+every_dir = [[-1, -1], [-1, 0], [-1, 1], [0, -1], [0, 1], [1, -1], [1, 0], [1, 1]]
 
 def bfs(start, end):
     bfs_paths = [[[] for _ in range(M)] for _ in range(N)]
@@ -63,6 +60,8 @@ for k in range(1,K+1):
                 target.append([-1 * board[n][m], last_attack[n][m], (m + n), n])
     attacker.sort()
     target.sort()
+    if(not attacker):
+        break
 
     attack_r, attack_c = [-1 * attacker[0][3], attacker[0][3] - attacker[0][2]]
     target_r, target_c = [target[0][3], target[0][2] - target[0][3]]
@@ -87,17 +86,22 @@ for k in range(1,K+1):
             free_this_turn[pr][pc] = False
             if (board[pr][pc] <= 0):
                 pt_counter -= 1
-        board[target_r][target_c] -= attack_pow
-        if (board[target_r][target_c] <= 0):
-            pt_counter -= 1
+
+        if (board[target_r][target_c] > 0):
+            board[target_r][target_c] -= attack_pow
+            if (board[target_r][target_c] <= 0):
+                pt_counter -= 1
     #     2.2 최단경로가 없다면, 포탄 공격
     #         피해 : 타켓의 주변 모든 포탑 (공격력//2)
     #         단, 공격자는 타격 없음
     else:
-        board[target_r][target_c] -= attack_pow
+        if (board[target_r][target_c] > 0):
+            board[target_r][target_c] -= attack_pow
+            if (board[target_r][target_c] <= 0):
+                pt_counter -= 1
         for ed in every_dir:
             nr, nc = [(target_r + ed[0])%N, (target_c + ed[1])%M]
-            if check_bound([nr, nc]) and board[nr][nc] > 0 and [nr, nc] != [attack_r, attack_c]:
+            if board[nr][nc] > 0 and [nr, nc] != [attack_r, attack_c]:
                 board[nr][nc] -= (attack_pow // 2)
                 free_this_turn[nr][nc] = False
                 if (board[nr][nc] <= 0):
