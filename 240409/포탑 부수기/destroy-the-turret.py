@@ -77,7 +77,7 @@ for k in range(1,K+1):
         #     2.1 최단경로가 있다면, 레이저 공격 먼저 시도
         #         피해 : 경로 상 포탑 (공격력//2) (우/하/좌/상의 우선순위대로 경로)
         for pr, pc in shortest_path[1:-1]:
-            if(board[pr][pc] < 0):
+            if(board[pr][pc] <= 0):
                 continue
             board[pr][pc] -= (attack_pow // 2)
             free_this_turn[pr][pc] = False
