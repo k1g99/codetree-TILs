@@ -93,12 +93,12 @@ def find_path(start, end):
     ret = deque()
     bc_r, bc_c = end
     bc_nr, bc_nc = back_track[bc_r][bc_c]
-    ret.append([bc_r, bc_c])
-    ret.append([bc_nr, bc_nc])
+    ret.appendleft([bc_r, bc_c])
+    ret.appendleft([bc_nr, bc_nc])
 
     while ([bc_nr, bc_nc] != start):
         bc_nr, bc_nc = back_track[bc_nr][bc_nc]
-        ret.append([bc_nr, bc_nc])
+        ret.appendleft([bc_nr, bc_nc])
 
     return ret
 
@@ -123,6 +123,8 @@ while man_in_store < len(man_target_store):
                 # 이번 t 끝나고 못움직일 칸 표시하기
                 man_in_store += 1
                 man_end[m] = True
+                man_current[m] = [nr, nc]
+                man_path_to_store[m].popleft()
                 continue
 
             if (board[nr][nc] == -1):
@@ -136,7 +138,13 @@ while man_in_store < len(man_target_store):
             man_current[m] = [nr, nc]
             man_path_to_store[m].popleft()
 
-        elif (t == m):
+        # 못움직일 칸 고정하기
+    for fr, fc in fix_cell:
+        board[fr][fc] = -1
+    fix_cell = []
+
+    for m in range(M):
+        if (t == m):
             # 처음 베이스 캠프에 들어가는거
             target_store = man_target_store[m]
 
