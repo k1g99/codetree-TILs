@@ -1,152 +1,141 @@
 from collections import deque
 
+answer = 0
 N, M, H, K = list(map(int, input().split()))
 
-runner = []  # runner 들의 현재 좌표 (rid 0은 없음)
-runner_dir = []  # 바라보고 있는 방향
-# runner_alive = [True for _ in range(M + 1)]  # runner 생존 여부
-# runner_alive[0] = False
-runner_board = [[[] for _ in range(N)] for _ in range(N)]  # runner 보드
-dir = [[0, 1], [1, 0], [0, -1], [-1, 0]]  # 우 하 좌 상
+dirs = [[-1, 0], [0, 1], [1, 0], [0, -1]]  # 상 / 우 / 하 / 좌 (시계방향)
+
+runner_loc = []
+runner_dir = []
+runner_board = [[[] for _ in range(N)] for _ in range(N)]
 
 tree_board = [[False for _ in range(N)] for _ in range(N)]
 
-soolae = [N // 2, N // 2]  # 술래 현재 좌표
-soolae_dir = 0  # 술래 바라보는 방향
-s_dir = [[-1, 0], [0, 1], [1, 0], [0, -1]]  # 상 우 하 좌
-# s_moves = 1
-soolae_dir_board = [[False for _ in range(N)] for _ in range(N)]
-order = 0
-
-answer = 0
+sul_loc = [N // 2, N // 2]
+sul_dir = 0
+sul_path_board = [[False for _ in range(N)] for _ in range(N)]
+sul_clock = True
 
 for m in range(M):
     x, y, d = list(map(int, input().split()))
-    #  1인 경우 좌우로 움직임을, 2인 경우 상하로만 움직임
-    runner.append([x - 1, y - 1])
-    if (d == 1):
-        runner_dir.append(0)
-    else:
-        runner_dir.append(1)
+    runner_loc.append([x - 1, y - 1])
+    runner_dir.append(d)
     runner_board[x - 1][y - 1].append(m)
 
 for h in range(H):
     x, y = list(map(int, input().split()))
     tree_board[x - 1][y - 1] = True
 
+
+###### 알고리즘
 def check_border(a):
     r, c = a
     return r >= 0 and c >= 0 and r < N and c < N
 
-def init_soolae_path():
-    point_dir = 0
 
-    sr, sc = [N // 2, N // 2]
-    soolae_dir_board[sr][sc] = True
-
-    for i in range(1, N):
-        sr, sc = [sr + s_dir[point_dir][0] * i, sc + s_dir[point_dir][1] * i]
-        point_dir = (point_dir + 1) % 4
-        soolae_dir_board[sr][sc] = True
-
-        sr, sc = [sr + s_dir[point_dir][0] * i, sc + s_dir[point_dir][1] * i]
-        point_dir = (point_dir + 1) % 4
-        soolae_dir_board[sr][sc] = True
-
-    soolae_dir_board[0][0] = True
-
-
-def bfs(s):
-    visited = [[False for _ in range(N)] for _ in range(N)]
+def bfs(curr):
     ret = []
-
     que = deque()
-    que.append([s[0], s[1], 0])
-    visited[s[0]][s[1]] = True
+    visited = [[False for _ in range(N)] for _ in range(N)]
+
+    cr, cc = curr
+    que.append([cr, cc, 0])
+    visited[cr][cc] = True
 
     while (que):
-        cr, cc, depth = que.popleft()
-        if (runner_board[cr][cc]):
-            for x in runner_board[cr][cc]:
-                ret.append(x)
+        tr, tc, depth = que.popleft()
+        if (runner_board[tr][tc]):
+            for rid in runner_board[tr][tc]:
+                ret.append(rid)
 
-        if (depth >= 3):
+        if (depth == 3):
             continue
 
-        for dr, dc in dir:
-            nr, nc = [cr + dr, cc + dc]
+        for dr, dc in dirs:
+            nr, nc = [tr + dr, tc + dc]
+
             if (check_border([nr, nc]) and not visited[nr][nc]):
-                visited[nr][nc] = True
                 que.append([nr, nc, depth + 1])
+                visited[nr][nc] = True
 
     return ret
 
 
-def sool_move(s):
-    r, c = s
-    global order, soolae_dir
+def init_sul_path():
+    sr, sc = [N // 2, N // 2]
+    sul_path_board[sr][sc] = True
+    sul_path_board[0][0] = True
+    s_dir = 0
 
-    if (order == 0):  # 정방향
-        nr, nc = [r + s_dir[soolae_dir][0], c + s_dir[soolae_dir][1]]
-        if ([nr, nc] == [0, 0]):
-            soolae_dir = 2
-            order = 1
+    for i in range(1, N):
+        sr, sc = [sr + dirs[s_dir][0] * i, sc + dirs[s_dir][1] * i]
+        sul_path_board[sr][sc] = True
+        s_dir = (s_dir + 1) % 4
 
-        elif (soolae_dir_board[nr][nc] == True):
-            soolae_dir = (soolae_dir + 1) % 4
-        return [nr, nc]
+        sr, sc = [sr + dirs[s_dir][0] * i, sc + dirs[s_dir][1] * i]
+        sul_path_board[sr][sc] = True
+        s_dir = (s_dir + 1) % 4
 
-    if (order == 1):  # 역방향
-        nr, nc = [r + s_dir[soolae_dir][0], c + s_dir[soolae_dir][1]]
-        if ([nr, nc] == [N // 2, N // 2]):
-            soolae_dir = 0
-            order = 0
 
-        elif (soolae_dir_board[nr][nc] == True):
-            soolae_dir = (soolae_dir - 1) % 4
-        return [nr, nc]
 
-init_soolae_path()
+def move_sul():
+    global sul_dir, sul_loc, sul_clock
+    sr, sc = sul_loc
+    nr, nc = [sr + dirs[sul_dir][0], sc + dirs[sul_dir][1]]
+
+    if([nr, nc] == [0,0]):
+        sul_dir = 2
+        sul_clock = False # 시계방향으로 돌고있는지,
+    elif([nr, nc] == [N//2,N//2]):
+        sul_dir = 0
+        sul_clock = True
+
+    elif(sul_path_board[nr][nc]):
+        # 방향 바꾸기
+        if(sul_clock):
+            sul_dir = (sul_dir + 1) % 4
+        else:
+            sul_dir = (sul_dir - 1) % 4
+
+    sul_loc = [nr, nc]
+
+
+init_sul_path()
+# print(sul_path_board)
 for k in range(1, K + 1):
-#     # 1. 도망자 이동
-#     # - 현재 술래와 거리가 3 이하인 도망자만 선정 (술래 좌표를 기준으로 거리가 3인 지점들만 찾는 게 좋을듯) bfs 쓰자
-    move_runner = bfs(soolae)
-    for rid in move_runner:
-        cr, cc = runner[rid]
-        rd = runner_dir[rid]
-        nr, nc = [cr + dir[rd][0], cc + dir[rd][1]]
-#         # - 현재 바라보고 있는 방향으로 1 이동할 때, 격자 밖인경우
+    # 1. 도망자 움직임
+
+    # - 술래와의 거리가 3 이하인 도망자만 선정 -> bfs()로 선정
+    move_runner = bfs(sul_loc)
+    # print(t, move_runner)
+    for runner_id in move_runner:
+        #     - 바라보고 있는 방향으로 1 이동이 불가한 경우, 반대로 방향을 틀기
+        rr, rc = runner_loc[runner_id]
+        rd = runner_dir[runner_id]
+        nr, nc = [rr + dirs[rd][0], rc + dirs[rd][1]]
         if (not check_border([nr, nc])):
-#             # - 반대로 방향을 튼다
-            runner_dir[rid] = (runner_dir[rid] + 2) % 4
-            rd = runner_dir[rid]
-#             # -> 1 이동하려고 한다
-            nr, nc = [cr + dir[rd][0], cc + dir[rd][1]]
+            runner_dir[runner_id] = (runner_dir[runner_id] + 2) % 4
+            rd = runner_dir[runner_id]
+            nr, nc = [rr + dirs[rd][0], rc + dirs[rd][1]]
 
-#         # - 술래가 있다 -> 가만히 있는다.
-#         # - 술래가 없다 -> 움직인다.
-        if ([nr, nc] != soolae):
-            runner[rid] = [nr, nc]
-            runner_board[cr][cc].remove(rid)
-            runner_board[nr][nc].append(rid)
+        #     - 다음 칸에 술래가 없는 경우만 이동
+        if ([nr, nc] != sul_loc):
+            runner_board[rr][rc].remove(runner_id)
+            runner_board[nr][nc].append(runner_id)
+            runner_loc[runner_id] = [nr, nc]
 
-#     # 2. 술래 이동
-#     # - 달팽이 모양 이동 ([n//2, n//2] -> 위1 -> 오른1 -> 아래2 -> 왼2)
-#     # - 이동 방향이 틀어지는 지점이라면 술래가 바라보는 방향 바로 틀기
-    soolae = sool_move(soolae)
-    # print(soolae, soolae_dir, order)
+    # 2. 술래 움직임
+    # - 술래 다음칸으로 이동 (달팽이모양)
+    move_sul()
+    # print(sul_loc, dirs[sul_dir])
 
-#     # - 바라보는 방향으로 3칸 (0, 1, 2)동안
+    # - 도망자 잡기 (현재 포함 3칸)
     for i in range(3):
-        watching = [soolae[0] + s_dir[soolae_dir][0] * i, soolae[1] + s_dir[soolae_dir][1] * i]
-#         # - 나무가 있는 칸이 아니라면 도망자 잡기
-        if(check_border(watching)):
-            if (not tree_board[watching[0]][watching[1]]):
-                if (runner_board[watching[0]][watching[1]]):
-                    for rid in runner_board[watching[0]][watching[1]]:
-                        # runner_alive[rid] = False
-                        rid_r, rid_c = runner[rid]
-                        runner_board[rid_r][rid_c].remove(rid)
-                        answer += k
+        sr, sc = sul_loc
+        catch_r, catch_c = [sr + dirs[sul_dir][0]*i, sc + dirs[sul_dir][1]*i]
+        if(check_border([catch_r, catch_c]) and not tree_board[catch_r][catch_c] and runner_board[catch_r][catch_c]):
+            point = len(runner_board[catch_r][catch_c])
+            answer += (k*point)
+            runner_board[catch_r][catch_c] = []
 
 print(answer)
