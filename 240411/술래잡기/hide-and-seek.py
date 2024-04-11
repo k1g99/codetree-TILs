@@ -7,6 +7,7 @@ dirs = [[-1, 0], [0, 1], [1, 0], [0, -1]]  # 상 / 우 / 하 / 좌 (시계방향
 
 runner_loc = []
 runner_dir = []
+runner_alive = M
 runner_board = [[[] for _ in range(N)] for _ in range(N)]
 
 tree_board = [[False for _ in range(N)] for _ in range(N)]
@@ -103,6 +104,8 @@ def move_sul():
 init_sul_path()
 # print(sul_path_board)
 for k in range(1, K + 1):
+    if runner_alive == 0:
+        break
     # 1. 도망자 움직임
 
     # - 술래와의 거리가 3 이하인 도망자만 선정 -> bfs()로 선정
@@ -136,6 +139,7 @@ for k in range(1, K + 1):
         if(check_border([catch_r, catch_c]) and not tree_board[catch_r][catch_c] and runner_board[catch_r][catch_c]):
             point = len(runner_board[catch_r][catch_c])
             answer += (k*point)
+            runner_alive -= point
             runner_board[catch_r][catch_c] = []
 
 print(answer)
