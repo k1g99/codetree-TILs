@@ -67,7 +67,10 @@ for _ in range(Q):
         eat_amount[name] = n
 
         eat_time[name] = []
-
+        if(not name in make_susi):
+            make_susi[name] = []
+            continue
+            
         for susi in make_susi[name]:
             tt, xx = susi
             cir, sq = entered[name]
