@@ -25,6 +25,20 @@ entered = dict()  # "sam" : [들어온 시간, 앉은 자리]
 count_man = 0
 count_susi = 0
 
+def binarySearch(arr, target):
+    left = 0
+    right = len(arr)
+    mid = (right + left) // 2
+
+    while (left < right):
+        if(arr[mid] <= target):
+            left = mid+1
+        else:
+            right = mid
+
+        mid = (right + left) // 2
+    return mid
+
 for _ in range(Q):
     order = list(input().split())
 
@@ -54,7 +68,7 @@ for _ in range(Q):
 
 
     elif (order[0] == '200'):  # 손님 입장
-        # dict 사용해서 "sam" : [먹을 수 있게 되는 시점] 순서대로 정리하기
+        # dict 사용해서 "sam" : [먹을 수 있게 되는 시점] 순서대로 정리 하기
 
         _, t, x, name, n = order
         t = int(t)
@@ -70,7 +84,7 @@ for _ in range(Q):
         if(not name in make_susi):
             make_susi[name] = []
             continue
-            
+
         for susi in make_susi[name]:
             tt, xx = susi
             cir, sq = entered[name]
@@ -91,11 +105,12 @@ for _ in range(Q):
 
             eat_time[names].sort()  # 정렬 [0,1,2,3 ...]
 
-            idx = 0
-            while (idx < len(eat_time[names])):
-                if (eat_time[names][idx] > t):
-                    break
-                idx += 1
+            idx = binarySearch(eat_time[names], t)
+            # idx = 0
+            # while (idx < len(eat_time[names])):
+            #     if (eat_time[names][idx] > t):
+            #         break
+            #     idx += 1
             eat_time[names] = eat_time[names][idx:]
             count_susi -= idx
             eat_amount[names] -= idx
