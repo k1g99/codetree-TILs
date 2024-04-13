@@ -14,7 +14,7 @@ santa_dead = [False for _ in range(P+1)]
 for p in range(1, P+1):
     sid, r, c = list(map(int, input().split()))
     santa_loc[sid] = [r-1,c-1]
-    santa_board[r-1][c-1] = p
+    santa_board[r-1][c-1] = sid
 
 #### 알고리즘
 
